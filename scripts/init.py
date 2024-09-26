@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import sys
+
 sys.path.append("/usr/local/IBSng")
 import curses
 import os
@@ -14,16 +15,29 @@ pg_hba_conf = "/var/lib/pgsql/data/pg_hba.conf"
 httpd_conf = "/etc/httpd/conf/httpd.conf"
 selinux_config_file = "/etc/selinux/config"
 
+
 def getDBConnection():
     from core import db_conf
+
     reload(db_conf)
     import pg
-    con = pg.connect("IBSng", db_conf.DB_HOST, db_conf.DB_PORT, None, None, db_conf.DB_USERNAME, db_conf.DB_PASSWORD)
+
+    con = pg.connect(
+        "IBSng",
+        db_conf.DB_HOST,
+        db_conf.DB_PORT,
+        None,
+        None,
+        db_conf.DB_USERNAME,
+        db_conf.DB_PASSWORD,
+    )
     return con
+
 
 def doSqlFile(con, file_name):
     content = open(file_name).read(1024 * 100)
     con.query(content)
+
 
 def callAndGetLines(command):
     fd = os.popen("%s 2>&1" % command, "r")
@@ -31,24 +45,26 @@ def callAndGetLines(command):
     fd.close()
     return lines
 
+
 def replaceInFile(filename, search_exp, replace_exp):
     try:
-        with open(filename, 'r') as file:
+        with open(filename, "r") as file:
             content = file.read()
         new_content = re.sub(search_exp, replace_exp, content)
-        with open(filename, 'w') as file:
+        with open(filename, "w") as file:
             file.write(new_content)
     except IOError:
         sys.exit("ERROR: Couldn't open or modify {}".format(filename))
 
-def addToFile(filename, content, position='first'):
+
+def addToFile(filename, content, position="first"):
     try:
-        with open(filename, 'r+') as f:
+        with open(filename, "r+") as f:
             lines = f.readlines()
-            if position == 'first':
-                lines.insert(0, content + '\n')
-            elif position == 'last':
-                lines.append(content + '\n')
+            if position == "first":
+                lines.insert(0, content + "\n")
+            elif position == "last":
+                lines.append(content + "\n")
             else:
                 raise ValueError("Invalid position. Use 'first' or 'last'.")
             f.seek(0)
@@ -56,12 +72,14 @@ def addToFile(filename, content, position='first'):
     except IOError:
         sys.exit("ERROR: Couldn't open or modify {}".format(filename))
 
+
 def isContentInFile(filename, content):
     try:
-        with open(filename, 'r') as file:
+        with open(filename, "r") as file:
             return content in file.read()
     except IOError:
         return False
+
 
 # checking root
 if os.getuid() != 0:
@@ -71,9 +89,11 @@ if os.getuid() != 0:
 try:
     import pg
 except ImportError:
-    sys.exit("ERROR: Install should be runned as root\n \
+    sys.exit(
+        "ERROR: Install should be runned as root\n \
               1-Install postgresql-python rpm on distribution CDs(redhat/fedora on last CD)\n \
-              2-Download and install it from http://www.pygresql.org/")
+              2-Download and install it from http://www.pygresql.org/"
+    )
 
 # trust ibsng pg pg_hba.conf
 pg_hba_content = "local  IBSng   ibs            trust"
@@ -97,9 +117,13 @@ ret = os.system("chmod 777 /usr/local/IBSng/core/defs_lib/defs2sql.py")
 if ret != 0:
     sys.exit("ERROR: cant run chmod 777 /usr/local/IBSng/core/defs_lib/defs2sql.py")
 
-ret = os.system("/usr/local/IBSng/core/defs_lib/defs2sql.py -i /usr/local/IBSng/core/defs_lib/defs_defaults.py /usr/local/IBSng/db/defs.sql 1>/dev/null 2>/dev/null")
+ret = os.system(
+    "/usr/local/IBSng/core/defs_lib/defs2sql.py -i /usr/local/IBSng/core/defs_lib/defs_defaults.py /usr/local/IBSng/db/defs.sql 1>/dev/null 2>/dev/null"
+)
 if ret != 0:
-    sys.exit("ERROR: File didn't compile successfully\nRecheck config file and try again")
+    sys.exit(
+        "ERROR: File didn't compile successfully\nRecheck config file and try again"
+    )
 
 # insert table
 con = None
@@ -122,7 +146,10 @@ password = "system"
 passwd_obj = password_lib.Password(password)
 try:
     con = getDBConnection()
-    con.query("update admins set password='%s' where username='system'" % passwd_obj.getMd5Crypt())
+    con.query(
+        "update admins set password='%s' where username='system'"
+        % passwd_obj.getMd5Crypt()
+    )
     con.close()
 except:
     if con:
@@ -142,25 +169,49 @@ if lines:
 
 # setup httpd
 if not os.path.exists(os.path.join(apache_conf_dir, "ibs.conf")):
-    lines = callAndGetLines("cp -f /usr/local/IBSng/addons/apache/ibs.conf %s" % apache_conf_dir)
+    lines = callAndGetLines(
+        "cp -f /usr/local/IBSng/addons/apache/ibs.conf %s" % apache_conf_dir
+    )
     if lines:
-        sys.exit("ERROR: Couldn't copy ibs.conf to " + apache_conf_dir + " ".join(lines).strip())
+        sys.exit(
+            "ERROR: Couldn't copy ibs.conf to "
+            + apache_conf_dir
+            + " ".join(lines).strip()
+        )
 lines = callAndGetLines("chown root:%s /var/log/IBSng" % apache_username)
 if lines:
-    sys.exit("ERROR: Couldn't change owner of /var/log/IBSng to " + apache_username + " ".join(lines).strip())
-lines = callAndGetLines("chown %s /usr/local/IBSng/interface/smarty/templates_c" % apache_username)
+    sys.exit(
+        "ERROR: Couldn't change owner of /var/log/IBSng to "
+        + apache_username
+        + " ".join(lines).strip()
+    )
+lines = callAndGetLines(
+    "chown %s /usr/local/IBSng/interface/smarty/templates_c" % apache_username
+)
 if lines:
-    sys.exit("ERROR: Couldn't change owner of /usr/local/IBSng/interface/smarty/templates_c to " + apache_username + " ".join(lines).strip())
+    sys.exit(
+        "ERROR: Couldn't change owner of /usr/local/IBSng/interface/smarty/templates_c to "
+        + apache_username
+        + " ".join(lines).strip()
+    )
 
 # copy log rotate
 if not os.path.exists(os.path.join(logrotate_conf_dir, "IBSng")):
-    lines = callAndGetLines("cp -f /usr/local/IBSng/addons/logrotate/IBSng %s" % logrotate_conf_dir)
+    lines = callAndGetLines(
+        "cp -f /usr/local/IBSng/addons/logrotate/IBSng %s" % logrotate_conf_dir
+    )
     if lines:
-        sys.exit("ERROR: Couldn't copy IBSng logrotate conf to " + logrotate_conf_dir + " ".join(lines).strip())
+        sys.exit(
+            "ERROR: Couldn't copy IBSng logrotate conf to "
+            + logrotate_conf_dir
+            + " ".join(lines).strip()
+        )
 
 # create ibsng service
 if not os.path.exists("/etc/init.d/IBSng"):
-    lines = callAndGetLines("cp -f /usr/local/IBSng/init.d/IBSng.init.redhat /etc/init.d/IBSng")
+    lines = callAndGetLines(
+        "cp -f /usr/local/IBSng/init.d/IBSng.init.redhat /etc/init.d/IBSng"
+    )
     if lines:
         sys.exit("ERROR: Couldn't copy init file." + " ".join(lines).strip())
 ret = os.system("chmod 777 /etc/init.d/IBSng")
@@ -182,21 +233,19 @@ if not isContentInFile(httpd_conf, httpd_conf_content):
 ret = os.system("setenforce 0")
 if ret != 0:
     sys.exit("ERROR: Failed to run 'setenforce 0'")
-replaceInFile(selinux_config_file, r'^SELINUX=.*', 'SELINUX=disabled')
-
+replaceInFile(selinux_config_file, r"^SELINUX=.*", "SELINUX=disabled")
 
 
 # enable services
 services = ["postgresql", "httpd", "IBSng"]
 for service in services:
-    ret = os.system(f"systemctl enable {service}")
+    ret = os.system("systemctl enable {}".format(service))
     if ret != 0:
-        sys.exit(f"ERROR: Failed to enable {service}")
-
+        sys.exit("ERROR: Failed to enable {}".format(service))
 for service in services:
-    ret = os.system(f"systemctl restart {service}")
+    ret = os.system("systemctl restart {}".format(service))
     if ret != 0:
-        sys.exit(f"ERROR: Failed to restart {service}")
+        sys.exit("ERROR: Failed to restart {}".format(service))
 
 
 # end
