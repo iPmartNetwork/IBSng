@@ -1,5 +1,4 @@
 #coding:utf-8
-
 # This file is part of 'NTLM Authorization Proxy Server'
 # Copyright 2001 Dmitry A. Rozmanov <dima@xenon.spb.ru>
 #
@@ -21,7 +20,7 @@
 
 from U32 import U32
 
-# пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ?
+# Что бы это значило?
 #typedef unsigned char des_cblock[8];
 #define HDRSIZE 4
 

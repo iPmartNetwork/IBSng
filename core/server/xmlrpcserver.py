@@ -1,3 +1,15 @@
+from xmlrpclib import Marshaller
+from decimal import Decimal
+
+
+def dump_decimal(self,value, write):
+    write("<value><double>")
+    write(str(value))
+    write("</double></value>\n")
+
+
+Marshaller.dispatch[Decimal] = dump_decimal
+
 # Changes made to make this work with IBS
 # Written by Brian Quinlan (brian@sweetapp.com).
 # Based on code written by Fredrik Lundh.
@@ -7,7 +19,7 @@ import SocketServer
 import BaseHTTPServer
 import sys
 import time
-from decimal import Decimal
+
 from core import main
 from core.server import handlers_manager
 from core.threadpool import thread_main
@@ -15,13 +27,6 @@ from core.stats import stat_main
 from core.ibs_exceptions import *
 from core.lib.general import *
 from core import defs
-
-def dump_decimal(self,value, write):
-    write("<value><double>")
-    write(str(value))
-    write("</double></value>\n")
-
-xmlrpclib.Marshaller.dispatch[Decimal] = dump_decimal
 
 class XMLRPCRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     """XML-RPC request handler class.
