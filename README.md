@@ -33,7 +33,7 @@ Follow these steps to swiftly install and configure the IBSNG Radius Server on y
 
 - **Access Your IBSNG Server**
 
-    Visit [http://server-ip/IBSng/admin](http://server-ip/IBSng/admin) to log in:
+    Visit http://server-ip/IBSng/admin to log in:
     
     - **Username:** system
     - **Password:** system
@@ -41,6 +41,10 @@ Follow these steps to swiftly install and configure the IBSNG Radius Server on y
 - **Security Suggestions**
 
     Change the default password and secure the admin panel by restricting IP access promptly.
+
+  
+### [training ibsng (persion)](https://raw.githubusercontent.com/imafaz/IBSng/main/training.pdf)
+
 
 ## Further Customization
 
