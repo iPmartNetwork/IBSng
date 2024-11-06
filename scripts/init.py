@@ -229,12 +229,6 @@ httpd_conf_content = """ServerName 127.0.0.1
 if not isContentInFile(httpd_conf, httpd_conf_content):
     addToFile(httpd_conf, httpd_conf_content)
 
-# disable selinux
-ret = os.system("setenforce 0")
-if ret != 0:
-    sys.exit("ERROR: Failed to run 'setenforce 0'")
-replaceInFile(selinux_config_file, r"^SELINUX=.*", "SELINUX=disabled")
-
 
 # enable services
 services = ["postgresql", "httpd", "IBSng"]
