@@ -40,8 +40,8 @@ systemctl start firewalld
 
 echo "Allowing necessary ports in the firewall: 80, 1812, 1813..."
 firewall-cmd --add-port=80/tcp --permanent
-firewall-cmd --add-port=1812/tcp --permanent
-firewall-cmd --add-port=1813/tcp --permanent
+firewall-cmd --add-port=1812/udp --permanent
+firewall-cmd --add-port=1813/udp --permanent
 firewall-cmd --reload
 
 echo "Running initialization script..."
