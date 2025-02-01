@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Check if the backup file path is provided as an argument
+if [ -z "$1" ]; then
+  echo "Error: Backup file path is missing."
+  echo "Usage: $0 /path/to/backup.sql"
+  exit 1
+fi
+
+BACKUP_FILE="$1"
+
+# Check if the backup file exists
+if [ ! -f "$BACKUP_FILE" ]; then
+  echo "Error: Backup file not found at $BACKUP_FILE"
+  exit 1
+fi
+
+# Stop the IBSng service
+service IBSng stop
+
+# Drop the existing IBSng database
+su postgres -c "dropdb IBSng"
+
+# Create a new IBSng database
+su postgres -c "createdb IBSng"
+
+# Restore the database from the backup file
+su postgres -c "psql IBSng < $BACKUP_FILE"
+
+# Start the IBSng service
+service IBSng start
+
+echo "Database restoration completed successfully."
