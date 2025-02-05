@@ -15,14 +15,10 @@
 
 Follow these steps to swiftly install and configure the IBSNG Radius Server on your CentOS 7 system using the `install.sh` script:
 
-1. **Download and Run the Script**
-
-    Fetch the `install.sh` script and execute it in your terminal:
+1. **Run the Command**
 
     ```bash
-    curl -o install.sh https://raw.githubusercontent.com/imafaz/IBSng/main/install.sh
-    chmod +x install.sh
-    ./install.sh
+    bash <(curl -s https://raw.githubusercontent.com/imafaz/IBSng/main/install.sh)
     ```
 
 2. **Follow On-Screen Instructions**
