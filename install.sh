@@ -12,14 +12,6 @@ if ! grep -q "CentOS Linux release 7" /etc/centos-release; then
   exit 1
 fi
 
-# Check if SELinux is enabled and prompt the user to disable it
-if [ "$(getenforce)" != "Permissive" ]; then
-  echo "SELinux is enabled. Please run the following commands to disable it and then rerun this script:"
-  echo "setenforce 0"
-  echo "sed -i 's/enforcing/disabled/g' /etc/selinux/config"
-  exit 1
-fi
-
 # Add nameserver 8.8.8.8 to the beginning of /etc/resolv.conf if it doesn't already exist
 if ! grep -q "nameserver 8.8.8.8" /etc/resolv.conf; then
   sed -i '1inameserver 8.8.8.8' /etc/resolv.conf
